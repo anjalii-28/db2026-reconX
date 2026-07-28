@@ -63,17 +63,17 @@ public final class DerivativeTrade implements TradeType {
     public long counterpartyId()     { return counterpartyId; }
 
     @Override public boolean equals(Object o) {
-        // TODO(TICKET-ADV028): pattern-match on DerivativeTrade and compare tradeRef.
-        throw new UnsupportedOperationException("TICKET-ADV028");
+        return o instanceof DerivativeTrade other && tradeRef.equals(other.tradeRef);
     }
     @Override public int hashCode() {
-        // TODO(TICKET-ADV028): hash from tradeRef.
-        throw new UnsupportedOperationException("TICKET-ADV028");
+        return tradeRef.hashCode();
     }
 
     @Override public String toString() {
-        // TODO(TICKET-ADV030): "DerivativeTrade[ref=..., TYPE UNDERLYING on date, strike=... CCY, qty=..., expiry=..., side=...]"
-        throw new UnsupportedOperationException("TICKET-ADV030");
+        // NOTE: counterpartyId is deliberately excluded to keep routine logs PII-safe.
+        return "DerivativeTrade[ref=%s, %s %s on %s, strike=%s %s, qty=%s, expiry=%s, side=%s]"
+                .formatted(tradeRef, optionType, underlying, tradeDate, strike.toPlainString(),
+                        currency.getCurrencyCode(), quantity.toPlainString(), expiry, side);
     }
 
     public static final class Builder {
@@ -97,6 +97,13 @@ public final class DerivativeTrade implements TradeType {
         public Builder tradeDate(LocalDate v)      { this.tradeDate = v; return this; }
         public Builder counterpartyId(long v)      { this.counterpartyId = v; return this; }
 
+        /**
+         * Builds an immutable derivative trade while allowing valid historical expiries.
+         *
+         * @return a non-null, validated derivative trade
+         * @throws NullPointerException if a required builder value was not supplied
+         * @throws IllegalStateException if contract fields fail domain invariants
+         */
         public DerivativeTrade build() {
             Objects.requireNonNull(tradeRef, "tradeRef");
             Objects.requireNonNull(underlying, "underlying");

@@ -59,17 +59,17 @@ public final class BondTrade implements TradeType {
     public long counterpartyId()      { return counterpartyId; }
 
     @Override public boolean equals(Object o) {
-        // TODO(TICKET-ADV028): pattern-match on BondTrade and compare tradeRef.
-        throw new UnsupportedOperationException("TICKET-ADV028");
+        return o instanceof BondTrade other && tradeRef.equals(other.tradeRef);
     }
     @Override public int hashCode() {
-        // TODO(TICKET-ADV028): hash from tradeRef.
-        throw new UnsupportedOperationException("TICKET-ADV028");
+        return tradeRef.hashCode();
     }
 
     @Override public String toString() {
-        // TODO(TICKET-ADV030): "BondTrade[ref=..., isin=..., face=... CCY, coupon=..., maturity=..., side=...]"
-        throw new UnsupportedOperationException("TICKET-ADV030");
+        // NOTE: counterpartyId is deliberately excluded to keep routine logs PII-safe.
+        return "BondTrade[ref=%s, isin=%s, face=%s %s, coupon=%s, maturity=%s, side=%s]"
+                .formatted(tradeRef, isin, faceValue.toPlainString(), currency.getCurrencyCode(),
+                        couponRate.toPlainString(), maturityDate, side);
     }
 
     public static final class Builder {
@@ -91,6 +91,13 @@ public final class BondTrade implements TradeType {
         public Builder tradeDate(LocalDate v)      { this.tradeDate = v; return this; }
         public Builder counterpartyId(long v)      { this.counterpartyId = v; return this; }
 
+        /**
+         * Builds an immutable bond trade after checking the ISIN and date ordering.
+         *
+         * @return a non-null, validated bond trade
+         * @throws NullPointerException if a required builder value was not supplied
+         * @throws IllegalStateException if bond-specific commercial or date invariants fail
+         */
         public BondTrade build() {
             Objects.requireNonNull(tradeRef, "tradeRef");
             Objects.requireNonNull(isin, "isin");
