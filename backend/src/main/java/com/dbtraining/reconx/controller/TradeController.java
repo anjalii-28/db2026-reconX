@@ -32,6 +32,7 @@ import java.util.Map;
  * /api/v1/trades, /api/v1/trades/{id} etc.
  * ============================================================================
  */
+
 @RestController
 @RequestMapping("/v1/trades")
 @Tag(name = "trades", description = "Trade CRUD and search")

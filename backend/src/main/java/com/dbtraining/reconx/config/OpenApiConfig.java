@@ -1,7 +1,14 @@
 package com.dbtraining.reconx.config;
 
 import org.springframework.context.annotation.Configuration;
-
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Contact;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
+import org.springframework.context.annotation.Bean;
+// import org.springframework.context.annotation.Configuration;
 /**
  * ============================================================================
  * OpenApiConfig — TICKET-ADV058
@@ -41,5 +48,26 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class OpenApiConfig {
 
-    // TODO(TICKET-ADV058): define the reconxOpenAPI() @Bean — see comments above.
+    @Bean
+    public OpenAPI reconxOpenAPI() {
+        return new OpenAPI()
+                .info(new Info()
+                        .title("ReconX API")
+                        .version("v1")
+                        .description("Enterprise Trade Reconciliation Platform (Advanced Track)")
+                        .contact(new Contact()
+                                .name("DB TDI Training")
+                                .email("tdi@db.com")))
+                .components(new Components()
+                        .addSecuritySchemes(
+                                "bearerAuth",
+                                new SecurityScheme()
+                                        .type(SecurityScheme.Type.HTTP)
+                                        .scheme("bearer")
+                                        .bearerFormat("JWT")
+                        ))
+                .addSecurityItem(
+                        new SecurityRequirement().addList("bearerAuth")
+                );
+    }
 }
