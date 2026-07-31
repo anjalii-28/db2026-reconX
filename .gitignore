@@ -1,0 +1,22 @@
+# ===========================================
+# ReconX project .gitignore
+# ===========================================
+
+# Maven build output
+backend/target/
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Node
+frontend/node_modules/
+
+# Environment
+.env
+*.env.local
