@@ -8,10 +8,26 @@ import java.util.Objects;
 
 import com.dbtraining.reconx.exception.InvalidTradeException;
 
+/**
+ * Converts untyped inbound trade payloads into validated domain trade instances.
+ *
+ * <p>This is the boundary between external map-based data and the sealed domain model;
+ * it has no state and reports malformed known trade payloads as {@code InvalidTradeException}.</p>
+ */
 public final class TradeFactory {
 
     private TradeFactory() { }
 
+    /**
+     * Builds a concrete trade for the supplied asset-class discriminator.
+     *
+     * @param assetClass the case-insensitive {@link TradeType.AssetClass} name
+     * @param parameters required payload values for the selected trade type
+     * @return a validated trade instance of the selected asset class
+     * @throws NullPointerException if the discriminator or parameter map is null
+     * @throws IllegalArgumentException if {@code assetClass} is not a known asset class
+     * @throws InvalidTradeException if a required value is missing or malformed
+     */
     public static TradeType create(String assetClass, Map<String, Object> parameters) {
         Objects.requireNonNull(assetClass, "assetClass");
         Objects.requireNonNull(parameters, "parameters");

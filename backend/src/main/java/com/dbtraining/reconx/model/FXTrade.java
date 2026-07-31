@@ -60,17 +60,18 @@ public final class FXTrade implements TradeType {
     public long counterpartyId()     { return counterpartyId; }
 
     @Override public boolean equals(Object o) {
-        // TODO(TICKET-ADV028): pattern-match on FXTrade and compare tradeRef.
-        throw new UnsupportedOperationException("TICKET-ADV028");
+        return o instanceof FXTrade other && tradeRef.equals(other.tradeRef);
     }
     @Override public int hashCode() {
-        // TODO(TICKET-ADV028): hash from tradeRef.
-        throw new UnsupportedOperationException("TICKET-ADV028");
+        return tradeRef.hashCode();
     }
 
     @Override public String toString() {
-        // TODO(TICKET-ADV030): "FXTrade[ref=..., CCY1/CCY2, notional=... CCY1, rate=..., side=...]"
-        throw new UnsupportedOperationException("TICKET-ADV030");
+        // NOTE: counterpartyId is deliberately excluded to keep routine logs PII-safe.
+        return "FXTrade[ref=%s, %s/%s, notional=%s %s, rate=%s, side=%s]"
+                .formatted(tradeRef, ccy1.getCurrencyCode(), ccy2.getCurrencyCode(),
+                        notionalCcy1.toPlainString(), ccy1.getCurrencyCode(),
+                        fxRate.toPlainString(), side);
     }
 
     public static final class Builder {
@@ -90,6 +91,13 @@ public final class FXTrade implements TradeType {
         public Builder tradeDate(LocalDate v)      { this.tradeDate = v; return this; }
         public Builder counterpartyId(long v)      { this.counterpartyId = v; return this; }
 
+        /**
+         * Builds an immutable FX trade after checking currencies and commercial invariants.
+         *
+         * @return a non-null, validated FX trade
+         * @throws NullPointerException if a required builder value was not supplied
+         * @throws IllegalStateException if currencies match or a monetary value is not positive
+         */
         public FXTrade build() {
             Objects.requireNonNull(tradeRef, "tradeRef");
             Objects.requireNonNull(ccy1, "ccy1");

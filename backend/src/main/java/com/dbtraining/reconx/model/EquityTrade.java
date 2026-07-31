@@ -66,20 +66,19 @@ public final class EquityTrade implements TradeType {
     /** equals: two EquityTrades are equal iff their tradeRef is equal. */
     @Override
     public boolean equals(Object o) {
-        // TODO(TICKET-ADV028): pattern-match on EquityTrade and compare tradeRef.
-        throw new UnsupportedOperationException("TICKET-ADV028");
+        return o instanceof EquityTrade other && tradeRef.equals(other.tradeRef);
     }
 
     @Override public int hashCode() {
-        // TODO(TICKET-ADV028): hash from tradeRef so it pairs with equals().
-        throw new UnsupportedOperationException("TICKET-ADV028");
+        return tradeRef.hashCode();
     }
 
     @Override
     public String toString() {
-        // TODO(TICKET-ADV030): "EquityTrade[ref=..., symbol=..., qty=..., price=... CCY, side=...]"
-        //                     — must NOT leak counterparty PII.
-        throw new UnsupportedOperationException("TICKET-ADV030");
+        // NOTE: counterpartyId is deliberately excluded to keep routine logs PII-safe.
+        return "EquityTrade[ref=%s, symbol=%s, qty=%s, price=%s %s, side=%s]"
+                .formatted(tradeRef, instrumentSymbol, quantity.toPlainString(), price.toPlainString(),
+                        currency.getCurrencyCode(), side);
     }
 
     /** Fluent builder. Required fields validated in {@link #build()}. */
@@ -103,6 +102,13 @@ public final class EquityTrade implements TradeType {
         public Builder tradeDate(LocalDate v)         { this.tradeDate = v;       return this; }
         public Builder counterpartyId(long v)         { this.counterpartyId = v;  return this; }
 
+        /**
+         * Builds an immutable equity trade after checking required values and equity invariants.
+         *
+         * @return a non-null, validated equity trade
+         * @throws NullPointerException if a required builder value was not supplied
+         * @throws IllegalStateException if the symbol is blank or a commercial value is not positive
+         */
         public EquityTrade build() {
             Objects.requireNonNull(tradeRef, "tradeRef");
             Objects.requireNonNull(instrumentSymbol, "instrumentSymbol");
