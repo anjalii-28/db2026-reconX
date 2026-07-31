@@ -47,8 +47,7 @@ public final class BondTrade implements TradeType {
 
     /** Notional = faceValue in the bond's currency. */
     @Override public Money notional() {
-        // TODO(TICKET-ADV021): return new Money(faceValue, currency).
-        throw new UnsupportedOperationException("TICKET-ADV021");
+        return new Money(faceValue, currency);
     }
 
     public String isin()              { return isin; }
@@ -93,11 +92,31 @@ public final class BondTrade implements TradeType {
         public Builder counterpartyId(long v)      { this.counterpartyId = v; return this; }
 
         public BondTrade build() {
-            // TODO(TICKET-ADV021):
-            //   - Objects.requireNonNull each required field.
-            //   - maturityDate must not be before tradeDate (IllegalStateException otherwise).
-            //   - return new BondTrade(this).
-            throw new UnsupportedOperationException("TICKET-ADV021");
+            Objects.requireNonNull(tradeRef, "tradeRef");
+            Objects.requireNonNull(isin, "isin");
+            Objects.requireNonNull(faceValue, "faceValue");
+            Objects.requireNonNull(couponRate, "couponRate");
+            Objects.requireNonNull(maturityDate, "maturityDate");
+            Objects.requireNonNull(currency, "currency");
+            Objects.requireNonNull(side, "side");
+            Objects.requireNonNull(tradeDate, "tradeDate");
+
+            if (isin.length() != 12) {
+                throw new IllegalStateException("isin must be 12 characters");
+            }
+            if (couponRate.signum() < 0) {
+                throw new IllegalStateException("couponRate must not be negative");
+            }
+            if (faceValue.signum() <= 0) {
+                throw new IllegalStateException("faceValue must be > 0");
+            }
+            if (maturityDate.isBefore(tradeDate)) {
+                throw new IllegalStateException("maturityDate cannot be before tradeDate");
+            }
+            if (maturityDate.isEqual(tradeDate)) {
+                throw new IllegalStateException("maturityDate must be after tradeDate");
+            }
+            return new BondTrade(this);
         }
     }
 }
