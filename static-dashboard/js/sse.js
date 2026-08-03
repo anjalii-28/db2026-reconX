@@ -1,27 +1,91 @@
-// TICKET-ADV106 / ADV107 — EventSource live feed with prepend + slide-in animation.
+// TICKET-ADV104 / TICKET-ADV105 — EventSource trade feed.
 (function () {
   const feed = document.getElementById('trade-feed');
-  if (!feed) return;
+  const statusBadge = document.getElementById('sse-status');
+  const streamUrl = '/api/v1/trades/stream';
+  const maxFeedEntries = 50;
+  let sse = null;
 
-  // Hardcoded demo events for the static dashboard (no backend required).
-  // Replace with: const sse = new EventSource('/api/v1/trades/stream');
-  const demoEvents = [
-    { tradeRef: 'EQU-20260603-0001', symbol: 'SAP.DE',  qty: 1000, price: 125.50, status: 'MATCHED' },
-    { tradeRef: 'FX-20260603-0001',  symbol: 'EUR/USD', qty: 1_000_000, price: 1.0852, status: 'PENDING' },
-    { tradeRef: 'EQU-20260603-0002', symbol: 'AAPL',    qty: 500,  price: 178.20, status: 'BREAK' },
-  ];
+  if (!feed || !window.EventSource) return;
 
-  function prepend(trade) {
-    const el = document.createElement('article');
-    el.className = 'trade-card trade-card--' + trade.status.toLowerCase();
-    el.innerHTML = `
-      <strong>${trade.tradeRef}</strong>
-      <span> ${trade.symbol} </span>
-      <span> qty=${trade.qty} </span>
-      <span> price=${trade.price} </span>
-      <span> [${trade.status}]</span>`;
-    feed.prepend(el);
+  function updateConnectionBadge(message, variant) {
+    if (!statusBadge) return;
+
+    statusBadge.textContent = message;
+    statusBadge.dataset.connection = variant;
   }
 
-  demoEvents.forEach((e, i) => setTimeout(() => prepend(e), 500 * i));
-})();
+  function escapeHtml(value) {
+    return String(value ?? '').replace(/[&<>'"]/g, (character) => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      "'": '&#39;',
+      '"': '&quot;'
+    }[character]));
+  }
+
+  function formatQuantity(value) {
+    return new Intl.NumberFormat('en-US').format(Number(value) || 0);
+  }
+
+  function formatPrice(value) {
+    return new Intl.NumberFormat('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 4
+    }).format(Number(value) || 0);
+  }
+
+  function statusModifier(status) {
+    switch (String(status || '').toUpperCase()) {
+      case 'MATCHED': return 'trade-card--matched';
+      case 'BREAK':
+      case 'UNMATCHED': return 'trade-card--break';
+      case 'PENDING': return 'trade-card--pending';
+      default: return '';
+    }
+  }
+
+  function prependTradeRow(trade) {
+    const status = String(trade.status || 'PENDING').toUpperCase();
+    const row = document.createElement('article');
+    const reference = trade.tradeRef || trade.tradeReference || 'Unknown trade';
+    const currency = trade.currency || '';
+
+    row.className = `trade-card ${statusModifier(status)} trade-card--new`.trim();
+    row.innerHTML = `
+      <header class="trade-card__header">
+        <strong>${escapeHtml(reference)}</strong>
+        <span>${escapeHtml(status)}</span>
+      </header>
+      <div class="trade-card__body">
+        <span>${escapeHtml(trade.symbol || '—')}</span>
+        <span>Qty: ${formatQuantity(trade.qty ?? trade.quantity)}</span>
+        <span>Price: ${formatPrice(trade.price)} ${escapeHtml(currency)}</span>
+      </div>`;
+
+    feed.prepend(row);
+    window.setTimeout(() => row.classList.remove('trade-card--new'), 500);
+
+    while (feed.children.length > maxFeedEntries) {
+      feed.lastElementChild.remove();
+    }
+  }
+
+  function connect() {
+    sse = new EventSource(streamUrl);
+
+    sse.onopen = () => updateConnectionBadge('Live', 'live');
+    sse.onmessage = (event) => {
+      try {
+        prependTradeRow(JSON.parse(event.data));
+      } catch (error) {
+        console.warn('Ignoring invalid trade stream payload.', error);
+      }
+    };
+    sse.onerror = () => updateConnectionBadge('Reconnecting…', 'reconnecting');
+  }
+
+  window.addEventListener('beforeunload', () => sse?.close());
+  connect();
+}());

@@ -11,6 +11,12 @@ TICKET-ADV100 — ARIA roles + aria-live for the trade feed
   <meta charset="utf-8" />
   <title>ReconX (static) — Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script>
+    (function () {
+      var savedTheme = localStorage.getItem('reconx-theme') || 'light';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    }());
+  </script>
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body class="app-shell">
@@ -21,7 +27,8 @@ TICKET-ADV100 — ARIA roles + aria-live for the trade feed
       <a href="trades.html">Trades</a>
       <a href="recon.html">Recon</a>
     </nav>
-    <button id="theme-toggle" aria-label="Toggle light/dark theme">🌗</button>
+    <span id="sse-status" class="sse-badge" role="status">Connecting…</span>
+    <button id="theme-toggle" type="button" aria-label="Toggle light/dark theme" aria-pressed="false">🌗</button>
   </header>
 
   <div class="app-body">
@@ -42,6 +49,7 @@ TICKET-ADV100 — ARIA roles + aria-live for the trade feed
           <article class="stat-card"><h3>Matched</h3><p>105</p></article>
           <article class="stat-card stat-card--warn"><h3>Open breaks</h3><p>15</p></article>
         </div>
+        <p class="alert--danger" role="alert">15 open reconciliation breaks require attention.</p>
       </section>
 
       <section aria-labelledby="feed">
