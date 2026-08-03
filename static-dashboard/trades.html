@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <title>ReconX (static) — Trades</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script>
+    (function () {
+      var savedTheme = localStorage.getItem('reconx-theme') || 'light';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    }());
+  </script>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="app-shell">
+  <header class="layout__header" role="banner">
+    <h1 class="layout__title">ReconX</h1>
+    <nav class="layout__nav" aria-label="Main navigation">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="trades.html" aria-current="page">Trades</a>
+      <a href="recon.html">Recon</a>
+    </nav>
+    <button id="theme-toggle" type="button" aria-label="Toggle light/dark theme" aria-pressed="false">🌗</button>
+  </header>
+
+  <div class="app-body">
+    <aside class="layout__sidebar" role="complementary">
+      <h2>Quick filters</h2>
+      <ul>
+        <li><a href="#trades-table">All trades</a></li>
+        <li><a href="#trades-table">Open breaks</a></li>
+        <li><a href="#trades-table">Today</a></li>
+      </ul>
+    </aside>
+
+    <main class="layout__main" role="main">
+      <section aria-labelledby="trades-heading">
+        <h2 id="trades-heading">Trades</h2>
+        <div class="table-scroll">
+          <table class="data-table" id="trades-table">
+            <thead>
+              <tr>
+                <th scope="col" data-col="tradeRef" data-dir="asc" data-type="string">Trade Ref <span class="resize-handle" aria-hidden="true"></span></th>
+                <th scope="col" data-col="symbol" data-dir="asc" data-type="string">Instrument <span class="resize-handle" aria-hidden="true"></span></th>
+                <th scope="col" data-col="quantity" data-dir="asc" data-type="number">Quantity <span class="resize-handle" aria-hidden="true"></span></th>
+                <th scope="col" data-col="price" data-dir="asc" data-type="number">Price <span class="resize-handle" aria-hidden="true"></span></th>
+                <th scope="col" data-col="status" data-dir="asc" data-type="string">Status <span class="resize-handle" aria-hidden="true"></span></th>
+              </tr>
+            </thead>
+            <tbody id="trades-tbody"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <footer class="layout__footer" role="contentinfo">
+    <small>ReconX TDI 2026 · static dashboard (Day 7)</small>
+  </footer>
+
+  <script src="js/theme.js"></script>
+  <script src="js/trades.js"></script>
+</body>
+</html>
