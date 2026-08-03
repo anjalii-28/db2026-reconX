@@ -36,6 +36,8 @@ D:\DBTraining\db2026-reconX\backend\src\main\java\com\dbtraining\reconx\model\Tr
 D:\DBTraining\db2026-reconX\backend\src\main\java\com\dbtraining\reconx\model\TradeRef.java
 D:\DBTraining\db2026-reconX\backend\src\main\java\com\dbtraining\reconx\model\TradeType.java
 D:\DBTraining\db2026-reconX\backend\src\main\java\com\dbtraining\reconx\observability\DatabaseHealthIndicator.java
+D:\DBTraining\db2026-reconX\backend\src\main\java\com\dbtraining\reconx\observability\KafkaHealthIndicator.java
+D:\DBTraining\db2026-reconX\backend\src\main\java\com\dbtraining\reconx\observability\MdcFilter.java
 D:\DBTraining\db2026-reconX\backend\src\main\java\com\dbtraining\reconx\observability\TradeMetrics.java
 D:\DBTraining\db2026-reconX\backend\src\main\java\com\dbtraining\reconx\ReconxApplication.java
 D:\DBTraining\db2026-reconX\backend\src\main\java\com\dbtraining\reconx\repository\AppUserRepository.java
