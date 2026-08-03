@@ -1,5 +1,5 @@
 package com.dbtraining.reconx.kafka;
-
+import org.springframework.kafka.annotation.KafkaListener;
 import com.dbtraining.reconx.dto.TradeEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +35,14 @@ public class ReconciliationConsumer {
 
     private static final Logger log = LoggerFactory.getLogger(ReconciliationConsumer.class);
 
+    @KafkaListener(topics = "trade-events", groupId = "recon-service")
     public void onTradeEvent(TradeEvent event) {
-        throw new UnsupportedOperationException("TICKET-ADV131");
+        log.info("Recon-trigger received eventId={} ref={} type={}",
+                event.eventId(),
+                event.tradeRef(),
+                event.eventType());
+
+        // Enqueue a recon job here (do NOT reconcile inline —
+        // that would block the consumer thread and back up the partition).
     }
 }
