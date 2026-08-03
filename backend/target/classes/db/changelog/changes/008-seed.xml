@@ -7,7 +7,8 @@
           changeSet file. CSV headers must match column names.
  WHY:     The student copy ships an empty DB; the trainer copy ships seeded
           data so demos work the moment the app boots.
- OBSERVE: SELECT count(*) FROM counterparties → 10. trades → 500.
+ OBSERVE: SELECT count(*) FROM counterparties → 10. instruments → 50.
+          trades → 500 (spread across 4 monthly partitions, Apr-Jul 2026).
           users → 4 (admin/trader/viewer/recon analyst).
  ============================================================================
 -->
@@ -42,6 +43,25 @@
         </loadData>
         <rollback>
             <sql>DELETE FROM instruments;</sql>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="008-seed-trades" author="student">
+        <loadData file="data/trades.csv" tableName="trades"
+                  separator="," relativeToChangelogFile="true">
+            <column name="id" type="NUMERIC"/>
+            <column name="trade_ref" type="STRING"/>
+            <column name="instrument_id" type="NUMERIC"/>
+            <column name="counterparty_id" type="NUMERIC"/>
+            <column name="asset_class" type="STRING"/>
+            <column name="side" type="STRING"/>
+            <column name="quantity" type="NUMERIC"/>
+            <column name="price" type="NUMERIC"/>
+            <column name="trade_date" type="DATE"/>
+            <column name="status" type="STRING"/>
+        </loadData>
+        <rollback>
+            <sql>DELETE FROM trades;</sql>
         </rollback>
     </changeSet>
 
